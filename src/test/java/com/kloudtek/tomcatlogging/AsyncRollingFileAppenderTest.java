@@ -18,15 +18,15 @@ import static org.testng.Assert.*;
  * Created by yannick on 10/16/15.
  */
 public class AsyncRollingFileAppenderTest {
-    @Test(enabled = false)
+    @Test(enabled = true)
     public void testLog() throws Exception{
         final File logFile = new File("target/test.log");
         if( logFile.exists() ) {
             logFile.delete();
         }
         MDC.put("mdckey","mdcval");
-        System.setProperty("log4j.debug","true");
-        Logger.getLogger(AsyncRollingFileAppenderTest.class).info("TEST",new IOException());
+//        System.setProperty("log4j.debug","true");
+        Logger.getLogger(AsyncRollingFileAppenderTest.class).info("\\\"TEST",new IOException());
         Thread.sleep(1500);
         try(FileInputStream fs = new FileInputStream(logFile)) {
             final String logs = IOUtils.toString(fs);
