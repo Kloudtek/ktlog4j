@@ -7,7 +7,6 @@ import org.apache.log4j.extras.DOMConfigurator;
 import org.apache.log4j.helpers.AppenderAttachableImpl;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.helpers.QuietWriter;
-import org.apache.log4j.pattern.LogEvent;
 import org.apache.log4j.rolling.RollingPolicy;
 import org.apache.log4j.rolling.RolloverDescription;
 import org.apache.log4j.rolling.TriggeringPolicy;
@@ -193,21 +192,17 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
         return this.locationInfo;
     }
 
-    public boolean requiresLayout() {
-        return true;
-    }
-
     public void setLocationInfo(boolean flag) {
         this.locationInfo = flag;
     }
 
     public void setBufferSize(int size) {
-        if(size < 0) {
+        if (size < 0) {
             throw new NegativeArraySizeException("size");
         } else {
             List var2 = this.buffer;
-            synchronized(this.buffer) {
-                this.bufferSize = size < 1?1:size;
+            synchronized (this.buffer) {
+                this.bufferSize = size < 1 ? 1 : size;
                 this.buffer.notifyAll();
             }
         }
@@ -219,7 +214,7 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
 
     public void setBlocking(boolean value) {
         List var2 = this.buffer;
-        synchronized(this.buffer) {
+        synchronized (this.buffer) {
             this.blocking = value;
             this.buffer.notifyAll();
         }
