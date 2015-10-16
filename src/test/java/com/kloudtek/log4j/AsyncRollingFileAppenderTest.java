@@ -1,18 +1,13 @@
-package com.kloudtek.tomcatlogging;
+package com.kloudtek.log4j;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
-import org.apache.log4j.SimpleLayout;
-import org.apache.log4j.rolling.FixedWindowRollingPolicy;
-import org.apache.log4j.rolling.SizeBasedTriggeringPolicy;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
-import static org.testng.Assert.*;
 
 /**
  * Created by yannick on 10/16/15.

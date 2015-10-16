@@ -1,4 +1,4 @@
-package com.kloudtek.tomcatlogging;
+package com.kloudtek.log4j;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
@@ -28,16 +28,16 @@ import java.util.*;
  * and tomcat log4j logging doesn't play well with XML logging (see https://tomcat.apache.org/tomcat-8.0-doc/logging.html) *sigh*.
  */
 public class AsyncRollingFileAppender extends FileAppender implements UnrecognizedElementHandler {
+    public static final int DEFAULT_BUFFER_SIZE = 128;
+    private final List<LoggingEvent> buffer = new ArrayList<>();
+    private final Map<String, DiscardSummary> discardMap = new HashMap<>();
+    private final Thread dispatcher;
+    AppenderAttachableImpl aai;
     private TriggeringPolicy triggeringPolicy;
     private RollingPolicy rollingPolicy;
     private long fileLength = 0L;
     private Action lastRolloverAsyncAction = null;
-    public static final int DEFAULT_BUFFER_SIZE = 128;
-    private final List<LoggingEvent> buffer = new ArrayList<>();
-    private final Map<String, DiscardSummary> discardMap = new HashMap<>();
     private int bufferSize = 128;
-    AppenderAttachableImpl aai;
-    private final Thread dispatcher;
     private boolean locationInfo = false;
     private boolean blocking = true;
 
@@ -145,7 +145,7 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
 
                     if (discard) {
                         String loggerName = event.getLoggerName();
-                        DiscardSummary summary = (DiscardSummary) this.discardMap.get(loggerName);
+                        DiscardSummary summary = this.discardMap.get(loggerName);
                         if (summary == null) {
                             summary = new DiscardSummary(event);
                             this.discardMap.put(loggerName, summary);
@@ -196,6 +196,10 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
         this.locationInfo = flag;
     }
 
+    public int getBufferSize() {
+        return this.bufferSize;
+    }
+
     public void setBufferSize(int size) {
         if (size < 0) {
             throw new NegativeArraySizeException("size");
@@ -208,8 +212,8 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
         }
     }
 
-    public int getBufferSize() {
-        return this.bufferSize;
+    public boolean getBlocking() {
+        return this.blocking;
     }
 
     public void setBlocking(boolean value) {
@@ -219,11 +223,6 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
             this.buffer.notifyAll();
         }
     }
-
-    public boolean getBlocking() {
-        return this.blocking;
-    }
-
 
     public boolean rollover() {
         if (this.rollingPolicy != null) {
@@ -282,7 +281,6 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
                                 try {
                                     success = ex.getSynchronous().execute();
                                 } catch (Exception var8) {
-                                    ;
                                 }
                             }
 
@@ -352,12 +350,12 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
         return this.rollingPolicy;
     }
 
-    public TriggeringPolicy getTriggeringPolicy() {
-        return this.triggeringPolicy;
-    }
-
     public void setRollingPolicy(RollingPolicy policy) {
         this.rollingPolicy = policy;
+    }
+
+    public TriggeringPolicy getTriggeringPolicy() {
+        return this.triggeringPolicy;
     }
 
     public void setTriggeringPolicy(TriggeringPolicy policy) {
@@ -537,8 +535,8 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
         }
 
         public LoggingEvent createEvent() {
-            String msg = MessageFormat.format("Discarded {0} messages due to full event buffer including: {1}", new Object[]{new Integer(this.count), this.maxEvent.getMessage()});
-            return new LoggingEvent("org.apache.log4j.AsyncAppender.DONT_REPORT_LOCATION", Logger.getLogger(this.maxEvent.getLoggerName()), this.maxEvent.getLevel(), msg, (Throwable) null);
+            String msg = MessageFormat.format("Discarded {0} messages due to full event buffer including: {1}", new Integer(this.count), this.maxEvent.getMessage());
+            return new LoggingEvent("org.apache.log4j.AsyncAppender.DONT_REPORT_LOCATION", Logger.getLogger(this.maxEvent.getLoggerName()), this.maxEvent.getLevel(), msg, null);
         }
     }
 }

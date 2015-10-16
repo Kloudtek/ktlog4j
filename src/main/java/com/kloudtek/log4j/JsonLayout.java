@@ -1,4 +1,4 @@
-package com.kloudtek.tomcatlogging;
+package com.kloudtek.log4j;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,6 +21,14 @@ public class JsonLayout extends Layout {
 
     public JsonLayout() {
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
+
+    private static String toString(Object obj) {
+        try {
+            return obj.toString();
+        } catch (Throwable e) {
+            return "Error getting message: " + e.getMessage();
+        }
     }
 
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
@@ -50,14 +58,6 @@ public class JsonLayout extends Layout {
         }
         r.put("mdc", MDC.getContext());
         return r;
-    }
-
-    private static String toString(Object obj) {
-        try {
-            return obj.toString();
-        } catch (Throwable e) {
-            return "Error getting message: " + e.getMessage();
-        }
     }
 
     private String getThrowable(LoggingEvent le) {
