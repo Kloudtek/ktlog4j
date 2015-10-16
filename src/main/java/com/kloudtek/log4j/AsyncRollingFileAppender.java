@@ -4,7 +4,6 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.extras.DOMConfigurator;
-import org.apache.log4j.helpers.AppenderAttachableImpl;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.helpers.QuietWriter;
 import org.apache.log4j.rolling.RollingPolicy;
@@ -32,7 +31,6 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
     private final List<LoggingEvent> buffer = new ArrayList<>();
     private final Map<String, DiscardSummary> discardMap = new HashMap<>();
     private final Thread dispatcher;
-    AppenderAttachableImpl aai;
     private TriggeringPolicy triggeringPolicy;
     private RollingPolicy rollingPolicy;
     private long fileLength = 0L;
@@ -173,7 +171,6 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
                 this.lastRolloverAsyncAction.close();
             }
         }
-        List e = this.buffer;
         synchronized (this.buffer) {
             this.closed = true;
             this.buffer.notifyAll();
@@ -185,7 +182,6 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
             Thread.currentThread().interrupt();
             LogLog.error("Got an InterruptedException while waiting for the dispatcher to finish.", var5);
         }
-
     }
 
     public boolean getLocationInfo() {
@@ -204,7 +200,6 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
         if (size < 0) {
             throw new NegativeArraySizeException("size");
         } else {
-            List var2 = this.buffer;
             synchronized (this.buffer) {
                 this.bufferSize = size < 1 ? 1 : size;
                 this.buffer.notifyAll();
@@ -217,7 +212,6 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
     }
 
     public void setBlocking(boolean value) {
-        List var2 = this.buffer;
         synchronized (this.buffer) {
             this.blocking = value;
             this.buffer.notifyAll();
@@ -281,6 +275,7 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
                                 try {
                                     success = ex.getSynchronous().execute();
                                 } catch (Exception var8) {
+                                    //
                                 }
                             }
 
@@ -300,8 +295,7 @@ public class AsyncRollingFileAppender extends FileAppender implements Unrecogniz
                             this.writeHeader();
                         }
 
-                        boolean var10000 = true;
-                        return var10000;
+                        return true;
                     }
                 } catch (Exception var10) {
                     exception = var10;
