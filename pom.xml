@@ -29,14 +29,15 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>log4j:apache-log4j-extras</exclude>
+                                </excludes>
+                            </artifactSet>
                             <relocations>
                                 <relocation>
                                     <pattern>com.google.gson</pattern>
                                     <shadedPattern>com.kloudtek.log4j.gson</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.apache.log4j</pattern>
-                                    <shadedPattern>com.kloudtek.log4j.log4j</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
